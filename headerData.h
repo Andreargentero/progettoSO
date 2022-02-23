@@ -19,6 +19,7 @@
 /* Costanti */
     #define SHM_KEY                 3121922
     /*#define MSG_KEY                 5051862*/
+    #define SHM_TABLE               3333
     #define SEM_KEY                 5051941
     #define MAXTEXT                 50
     # define CLOCK_REALTIME         0

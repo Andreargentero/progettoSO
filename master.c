@@ -33,13 +33,13 @@ void handler_int(int s) {
 
 int main(int argc, char** argv){
     double accum;
-    pid_t pid;
+    int shmid_table;
     int pID;
     int msgid;
-    int/*for*/ i = 0,z = 0,l,m,o,n,k;
+    int/*for*/ i = 0,z = 0,*T,m,k;
     int supBoy = 0;
     char str[10];
-    struct MatrixNodes *datiNodi;
+    Struttura_Stampa *datiNodi;
     
     
     
@@ -49,17 +49,19 @@ int main(int argc, char** argv){
 
     semid = semget(IPC_PRIVATE,2,IPC_CREAT|S_IRUSR | S_IWUSR);
     SemID_NU = semget(SEM_KEY,SO_NODES_NUM,IPC_CREAT|S_IRUSR | S_IWUSR);
-    shmid = shmget(SHM_KEY, sizeof(struct MatrixNodes), IPC_CREAT|0666);
-    datiNodi = (struct MatrixNodes *)shmat(shmid,NULL,0);
+    shmid = shmget(SHM_KEY, sizeof(Struttura_Stampa), IPC_CREAT|0666);
+    shmid_table = shmget(SHM_TABLE, sizeof(int)*((SO_USERS_NUM*2)+(SO_NODES_NUM*2)), IPC_CREAT|0666);
+    datiNodi = (Struttura_Stampa *)shmat(shmid,NULL,0);
 
+    T = shmat(shmid_table, NULL,0);
     
     initSemAvailable(semid,0);
     initSemInUse(semid,1);
     initSemAvailable(SemID_NU,0);
 
-    Utenti(i, pid, semid, str);
+    Utenti(i, T, semid, str);
 
-    Nodi(z, pid, semid, str);
+    Nodi(z, T, semid, str);
 
     printf("Press Ctrl+C to start.\n");
     printf("Press Ctrl+z or Ctrl+\\ to terminate.\n");
@@ -81,20 +83,20 @@ int main(int argc, char** argv){
             printf("-terminazione per tempo\n");
 
             printf("-Bilancio Utenti:\n");
-            /*for( l = 0; l < SO_USERS_NUM; l++){
-                printf("%d = %d\n", dati->MatrixUsers[l][0], dati->MatrixUsers[l][1]);
-            }*/
+            for( m = 0; m < SO_USERS_NUM; m++){
+                printf("%d\n", T[m]);
+            }
 
             printf("-Bilancio Nodi:\n");
-            for( m = 0; m < SO_NODES_NUM; m++){
-                printf("%d = %d\n", datiNodi->PID[m], datiNodi->Wallet[m]);
+            for( m = (SO_USERS_NUM*2); m < SO_NODES_NUM+(SO_USERS_NUM*2); m++){
+                printf("%d\n", T[m]);
             }
 
             printf("-Utenti terminati prematuramente:\n");
-            /*for( o = 0; o < SO_USERS_NUM; o++){
-                supBoy += dati->MatrixUsers[o][2];
+            for( m = SO_USERS_NUM; m < SO_USERS_NUM*2; m++){
+                supBoy += T[m];
             }
-                printf("%d\n", supBoy);*/
+                printf("%d\n", supBoy);
 
             printf("-Numero Blocchi Libro Mastro\n");
 
@@ -106,14 +108,16 @@ int main(int argc, char** argv){
 
             semctl(semid, 0, IPC_RMID);
             semctl(SemID_NU, 0, IPC_RMID);
-            for( k = 0; k < SO_NODES_NUM; k++){
-                msgid = msgget(datiNodi->PID[k], 0);
+            for( k = (SO_USERS_NUM*2); k < (SO_USERS_NUM*2)+SO_NODES_NUM; k++){
+                msgid = msgget(T[k], 0);
                 msgctl(msgid, IPC_RMID, NULL);
             }
             system("killall -SIGKILL Nodo");
             system("killall -SIGKILL Utente");
             shmdt(datiNodi);
+            shmdt(T);
             shmctl(shmid, 0, IPC_RMID);
+            shmctl(shmid_table, 0, IPC_RMID);
             exit(EXIT_SUCCESS);
         }
 

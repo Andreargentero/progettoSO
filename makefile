@@ -6,15 +6,16 @@ simulation: compile
 compile:	master Nodo Utente
 
 clean:
-	clear
 	ipcrm -a
 	rm master
 	rm Nodo
 	rm Utente
+	clear
 
 run:
 	clear
 	./master
+
 #=============================================================
 
 CC = gcc -std=c89 -Wall -pedantic

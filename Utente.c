@@ -11,7 +11,7 @@ int main(int argc, char** argv){
     
     int i = 0, n = 0;
     time_t t;
-    struct MatrixNodes *datiNodi;
+    Struttura_Stampa *datiNodi;
     int shmid;
 
     struct timespec tim, tim2;
@@ -25,8 +25,8 @@ int main(int argc, char** argv){
     timerand = (SO_MAX_TRANS_GEN_NSEC-SO_MIN_TRANS_GEN_NSEC)+1;
     srand((unsigned) time(&t)*getpid()/*wallet*/);
         
-    shmid = shmget(SHM_KEY, sizeof(struct MatrixNodes), 0);
-    datiNodi = (struct MatrixNodes *)shmat(shmid,NULL,0);
+    shmid = shmget(SHM_KEY, sizeof(Struttura_Stampa), 0);
+    datiNodi = (Struttura_Stampa *)shmat(shmid,NULL,0);
     semid = semget(SEM_KEY, SO_NODES_NUM, S_IRUSR | S_IWUSR);
     tim.tv_sec = 0;
     tim.tv_nsec = rand() % timerand + SO_MIN_TRANS_GEN_NSEC;

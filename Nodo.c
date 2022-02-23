@@ -10,9 +10,9 @@
 int main(int argc, char** argv){
 
     struct LibroMastro *dati;
-    struct MatrixNodes *datiNodi;
+    Struttura_Stampa *datiNodi;
     
-    int msgid,shmid;
+    int msgid,shmid, shmid_table, *T;
     time_t t;
     int i,j;
     int timerand = (SO_MAX_TRANS_PROC_NSEC-SO_MIN_TRANS_PROC_NSEC)+1;
@@ -29,10 +29,10 @@ int main(int argc, char** argv){
     tim.tv_sec = 0;
     tim.tv_nsec = rand() % timerand + SO_MIN_TRANS_PROC_NSEC;
     msgid = msgget(getpid(), IPC_CREAT| 666);
-    shmid = shmget(SHM_KEY, sizeof(struct MatrixNodes), 0);
-    datiNodi = (struct MatrixNodes *)shmat(shmid,NULL,0);
-
-    datiNodi->PID[atoi(argv[1])] = getpid();
+    shmid = shmget(SHM_KEY, sizeof(Struttura_Stampa), 0);
+    shmid_table = shmget(SHM_TABLE,sizeof(int)*((SO_USERS_NUM*2)+(SO_NODES_NUM*2)), 0);
+    datiNodi = (Struttura_Stampa *)shmat(shmid,NULL,0);
+    T = shmat(shmid_table,NULL,0);
 
     while(1){
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
         j = 0;
 
             while(j != SO_BLOCK_SIZE-1){
-                dati -> LibroMastro[0][0/**/] = 0;
+                dati -> LibroMastro[0] = 0;
             }
 
  
