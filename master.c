@@ -21,6 +21,23 @@ void handler_int(int s) {
 
 }
 
+/*void handler_master(int s) {
+
+            semctl(semid, 0, IPC_RMID);
+            semctl(SemID_NU, 0, IPC_RMID);
+            semctl(semID,0, IPC_RMID);
+            for( k = 0; k < SO_NODES_NUM; k++){
+                msgid = msgget(T[k], 0);
+                msgctl(msgid, IPC_RMID, NULL);
+            }
+            shmdt(datiNodi);
+            shmdt(T);
+            shmctl(shmid, 0, IPC_RMID);
+            shmctl(shmid_table, 0, IPC_RMID);
+            exit(EXIT_SUCCESS);
+
+}*/
+
 /*void handler_int2(int s) {
 
         shmdt(dati);
@@ -36,6 +53,7 @@ int main(int argc, char** argv){
     int shmid_table;
     int pID;
     int msgid;
+    int semID;
     int/*for*/ i = 0,z = 0,*T,m,k;
     int supBoy = 0;
     char str[10];
@@ -45,18 +63,22 @@ int main(int argc, char** argv){
     
     system("stty -echoctl");
     signal(SIGINT, handler_int);
+    /*signal(SIGUSR2, handler_master);*/
     /*signal(SIGCHLD, handler_int2);*/
 
     semid = semget(IPC_PRIVATE,2,IPC_CREAT|S_IRUSR | S_IWUSR);
     SemID_NU = semget(SEM_KEY,SO_NODES_NUM,IPC_CREAT|S_IRUSR | S_IWUSR);
+    semID = semget(1000, 2, IPC_CREAT|S_IRUSR | S_IWUSR);
     shmid = shmget(SHM_KEY, sizeof(Struttura_Stampa), IPC_CREAT|0666);
-    shmid_table = shmget(SHM_TABLE, sizeof(int)*((SO_USERS_NUM*2)+(SO_NODES_NUM*2)), IPC_CREAT|0666);
+    shmid_table = shmget(SHM_TABLE, sizeof(int)*((SO_NODES_NUM)), IPC_CREAT|0666);
     datiNodi = (Struttura_Stampa *)shmat(shmid,NULL,0);
 
     T = shmat(shmid_table, NULL,0);
     
     initSemAvailable(semid,0);
     initSemInUse(semid,1);
+    initSemInUse(semID,0);
+    initSemInUse(semID,1);
     initSemAvailable(SemID_NU,0);
 
     Utenti(i, T, semid, str);
@@ -65,6 +87,7 @@ int main(int argc, char** argv){
 
     printf("Press Ctrl+C to start.\n");
     printf("Press Ctrl+z or Ctrl+\\ to terminate.\n");
+    printf("--------------------------------------\n");
 
     while (1)
     {
@@ -79,24 +102,27 @@ int main(int argc, char** argv){
 
         if(accum == SO_SIM_SEC){
 
+            system("killall -SIGKILL Nodo");
+            system("killall -SIGKILL Utente");
+
             printf("--------------------------------------\n");            
             printf("-terminazione per tempo\n");
 
             printf("-Bilancio Utenti:\n");
-            for( m = 0; m < SO_USERS_NUM; m++){
+            /*for( m = 0; m < SO_USERS_NUM; m++){
                 printf("%d\n", T[m]);
-            }
+            }*/
 
             printf("-Bilancio Nodi:\n");
-            for( m = (SO_USERS_NUM*2); m < SO_NODES_NUM+(SO_USERS_NUM*2); m++){
+            for( m = 0; m < SO_NODES_NUM; m++){
                 printf("%d\n", T[m]);
             }
 
             printf("-Utenti terminati prematuramente:\n");
-            for( m = SO_USERS_NUM; m < SO_USERS_NUM*2; m++){
+            /*for( m = SO_USERS_NUM; m < SO_USERS_NUM*2; m++){
                 supBoy += T[m];
             }
-                printf("%d\n", supBoy);
+                printf("%d\n", supBoy);*/
 
             printf("-Numero Blocchi Libro Mastro\n");
 
@@ -108,12 +134,11 @@ int main(int argc, char** argv){
 
             semctl(semid, 0, IPC_RMID);
             semctl(SemID_NU, 0, IPC_RMID);
-            for( k = (SO_USERS_NUM*2); k < (SO_USERS_NUM*2)+SO_NODES_NUM; k++){
+            semctl(semID,0, IPC_RMID);
+            for( k = 0; k < SO_NODES_NUM; k++){
                 msgid = msgget(T[k], 0);
                 msgctl(msgid, IPC_RMID, NULL);
             }
-            system("killall -SIGKILL Nodo");
-            system("killall -SIGKILL Utente");
             shmdt(datiNodi);
             shmdt(T);
             shmctl(shmid, 0, IPC_RMID);
