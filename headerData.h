@@ -1,6 +1,6 @@
 /* Dati Progetto */
-    #define SO_USERS_NUM            10
-    #define SO_NODES_NUM            5
+    #define SO_USERS_NUM            100
+    #define SO_NODES_NUM            10
     #define SO_BUDGET_INIT          1000
     #define SO_REWARD               1
     #define SO_MIN_TRANS_GEN_NSEC   100000000

@@ -9,7 +9,7 @@
 int main(int argc, char** argv){
     
     
-    int i = SO_BUDGET_INIT, n = 0, j=0;
+    int i = SO_BUDGET_INIT, n = 0, j=0, k = 0;
     time_t t;
     Struttura_Stampa *datiNodi;
     int shmid;
@@ -18,7 +18,7 @@ int main(int argc, char** argv){
     messaggio msg;
 
     int timerand;
-    int semid,shmid_table;
+    int semid,shmid_table, msgsend;
     int msgid = 0;
     int *T;
 
@@ -41,21 +41,30 @@ int main(int argc, char** argv){
         if(/*wallet*/3 >= 2){
                 reserveSem(semid,0);
             
-            while(j < 5 && msgid <= 0){
-                msgid = msgget((pid_t)T[rand() % 10],0777);
-                j++;
+            while(msgid < 0){
+                msgid = msgget((pid_t)T[rand() % SO_NODES_NUM],0777);
             }
-
-                if(j == 5){
-                    kill(getpid(), 0);
-                }
 
                     msg.qualcosa = 200;
                     msg.pid = getpid();
+                    
+                    msgsend=msgsnd(msgid, &msg,sizeof(msg),IPC_NOWAIT);
 
-                    if(msgsnd(msgid, &msg,sizeof(msg),IPC_NOWAIT) <0){
+                    if( msgsend < 0){
                         
-                    printf("messaggio non inviato\n");
+                    while (msgsend < 0)
+                    {
+                        /*printf("while\n");*/
+                        msgsend=msgsnd(msgid, &msg,sizeof(msg),IPC_NOWAIT);
+                        if(k == 1-1){
+                            printf("Uccisione Utente\n");
+                            kill(getpid());
+                        }
+                        k++;
+                    }
+
+                    printf("redivivo\n");
+                    
                     }
 
                 /*Transaction.Timestamp = 0;
