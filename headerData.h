@@ -2,7 +2,7 @@
     #define SO_USERS_NUM            100
     #define SO_NODES_NUM            10
     #define SO_BUDGET_INIT          1000
-    #define SO_REWARD               1
+    #define SO_REWARD               10
     #define SO_MIN_TRANS_GEN_NSEC   100000000
     #define SO_MAX_TRANS_GEN_NSEC   200000000
     #define SO_RETRY                20
@@ -20,6 +20,7 @@
     #define SHM_KEY                 3121922
     /*#define MSG_KEY                 5051862*/
     #define SHM_TABLE               3333
+    #define SHM_USER                4444
     #define SEM_KEY                 5051941
     #define MAXTEXT                 50
     # define CLOCK_REALTIME         0

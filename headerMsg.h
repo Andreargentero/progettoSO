@@ -1,14 +1,11 @@
 #include "headerData.h"
 
 typedef struct my_msg{
-    /*long Timestamp;
+    long msg_type;
+    float Timestamp;
     int sender;
     int reciver;
     int transfer;
-    int reward; */  
-
-    long msg_type;
-    int qualcosa;
-    int pid;
+    float reward; 
 }messaggio;
 

@@ -50,8 +50,7 @@ int main(int argc, char** argv){
                 printf("messaggio non ricevuto\n");
             }
             else{
-                /*printf("%i\n", msg.pid);*/
-                printf("%i , %d, %d\n", msg.qualcosa, getpid(), msg.pid);
+                printf("Transazione di %d con reward di %.0f all'istante %.4f, NODO %d, Utente sender %d, Utente reciver %d\n\n", msg.transfer, msg.reward, msg.Timestamp, getpid(), msg.sender, msg.reciver);
                 TransactionPool++;
             }
 

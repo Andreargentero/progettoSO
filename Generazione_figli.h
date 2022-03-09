@@ -1,6 +1,6 @@
 #include "includer.h"
 
-void Utenti(int i, int *T, int semid, char str[]){
+void Utenti(int i, int *U, int semid, char str[]){
 
     int pid;
 
@@ -12,7 +12,7 @@ void Utenti(int i, int *T, int semid, char str[]){
             execlp("./Utente", "./Utente", str);
             break;
         default: /*padre*/
-            /*T[i] = pid;*/
+            U[i] = pid;
             /*T[i+SO_USERS_NUM] = 0;*/
             break;
         }

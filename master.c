@@ -50,11 +50,11 @@ void handler_int(int s) {
 
 int main(int argc, char** argv){
     double accum;
-    int shmid_table;
+    int shmid_table,shmid_user;
     int pID;
     int msgid;
     int semID;
-    int/*for*/ i = 0,z = 0,*T,m,k;
+    int/*for*/ i = 0,z = 0,*T,*U,m,k;
     int supBoy = 0;
     char str[10];
     Struttura_Stampa *datiNodi;
@@ -70,10 +70,12 @@ int main(int argc, char** argv){
     SemID_NU = semget(SEM_KEY,SO_NODES_NUM,IPC_CREAT|S_IRUSR | S_IWUSR);
     semID = semget(1000, 2, IPC_CREAT|S_IRUSR | S_IWUSR);
     shmid = shmget(SHM_KEY, sizeof(Struttura_Stampa), IPC_CREAT|0666);
-    shmid_table = shmget(SHM_TABLE, sizeof(int)*((SO_NODES_NUM)), IPC_CREAT|0666);
+    shmid_table = shmget(SHM_TABLE, sizeof(int)*(SO_NODES_NUM), IPC_CREAT|0666);
+    shmid_user = shmget(SHM_USER, sizeof(int)*(SO_USERS_NUM),IPC_CREAT | 0666);
     datiNodi = (Struttura_Stampa *)shmat(shmid,NULL,0);
 
     T = shmat(shmid_table, NULL,0);
+    U = shmat(shmid_user, NULL, 0);
     
     initSemAvailable(semid,0);
     initSemInUse(semid,1);
@@ -81,7 +83,7 @@ int main(int argc, char** argv){
     initSemInUse(semID,1);
     initSemAvailable(SemID_NU,0);
 
-    Utenti(i, T, semid, str);
+    Utenti(i, U, semid, str);
 
     Nodi(z, T, semid, str);
 
@@ -99,7 +101,7 @@ int main(int argc, char** argv){
         accum = ( stop.tv_sec - start.tv_sec )
             + ( stop.tv_nsec - start.tv_nsec )
             / BILLION;
-
+        printf("%d\n",accum);
         if(accum == SO_SIM_SEC){
 
             system("killall -SIGKILL Nodo");
@@ -109,13 +111,13 @@ int main(int argc, char** argv){
             printf("-terminazione per tempo\n");
 
             printf("-Bilancio Utenti:\n");
-            /*for( m = 0; m < SO_USERS_NUM; m++){
-                printf("%d\n", T[m]);
-            }*/
+            for( m = 0; m < SO_USERS_NUM; m++){
+                printf("%d\n", U[m]);
+            }
 
             printf("-Bilancio Nodi:\n");
             for( m = 0; m < SO_NODES_NUM; m++){
-                printf("%d\n", T[m]);
+                /*printf("%d\n", T[m]);*/
             }
 
             printf("-Utenti terminati prematuramente:\n");
@@ -141,8 +143,10 @@ int main(int argc, char** argv){
             }
             shmdt(datiNodi);
             shmdt(T);
+            shmdt(U);
             shmctl(shmid, 0, IPC_RMID);
             shmctl(shmid_table, 0, IPC_RMID);
+            shmctl(shmid_user, 0, IPC_RMID);
             exit(EXIT_SUCCESS);
         }
 
